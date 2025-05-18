@@ -182,88 +182,106 @@ import java.util.*;
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        String today = "2025-05-11"; // static date for demo
+
+            // === LOAD EXISTING DATA ===
+        Object[] savedData = DataStorage.loadData();
+        Map<String, NutritionLog> nutritionLogsByDate = new HashMap<>();
+        Map<String, WorkoutLog> workoutLogsByDate = new HashMap<>();
+        List<DailySummary> summaryList = new ArrayList<>();
+
+        if (savedData != null) {
+            nutritionLogsByDate = (Map<String, NutritionLog>) savedData[0];
+            workoutLogsByDate = (Map<String, WorkoutLog>) savedData[1];
+            summaryList = (List<DailySummary>) savedData[2];
+            System.out.println("\n📂 Loaded previous session data");
+        }
 
         // === USER SETUP ===
         GoalType goal = GoalType.LOSE_WEIGHT; // change to GAIN_MUSCLE or MAINTAIN if needed
         User user = new User("Ali", 22, 1.75, 68, goal);
 
-        // === DATA STORAGE ===
-        Map<String, NutritionLog> nutritionLogsByDate = new HashMap<>();
-        Map<String, WorkoutLog> workoutLogsByDate = new HashMap<>();
-        List<DailySummary> summaryList = new ArrayList<>();
 
-        // === NUTRITION LOG ===
-        NutritionLog nutritionLog = new NutritionLog(today);
-        System.out.println("Log your food (type 'done' to finish):");
-        FoodDatabase.printAvailableFoods();
+        // === MAIN LOGGING LOOP ===
         while (true) {
-            System.out.print("Food name: ");
-            String input = scanner.nextLine();
-            if (input.equalsIgnoreCase("done")) break;
-            FoodItem item = FoodDatabase.getFood(input);
-            if (item != null) {
-                nutritionLog.addFoodItem(item);
-                System.out.println("✅ Added: " + item.getNutrients());
-            } else {
-                System.out.println("❌ Food not found.");
+            System.out.print("\nEnter date to log (YYYY-MM-DD) or 'done' to finish: ");
+            String date = scanner.nextLine().trim();
+            if (date.equalsIgnoreCase("done")) break;
+
+            // Check for existing entries
+            if (nutritionLogsByDate.containsKey(date)) {
+                System.out.print("Logs for " + date + " exist. Overwrite? (yes/no): ");
+                String choice = scanner.nextLine().trim();
+                if (!choice.equalsIgnoreCase("yes")) continue;
             }
-        }
 
-        // === WORKOUT LOG ===
-        WorkoutLog workoutLog = new WorkoutLog(today);
-        System.out.println("\nLog your cardio (type 'done' to finish):");
-        ExerciseDatabase.printAvailableExercises();
-        while (true) {
-            System.out.print("Cardio type: ");
-            String type = scanner.nextLine();
-            if (type.equalsIgnoreCase("done")) break;
-            System.out.print("Duration (min): ");
-            int duration = Integer.parseInt(scanner.nextLine());
-            String intensity = ExerciseDatabase.getIntensity(type);
-            Cardio cardio = new Cardio(type, duration, type, intensity, user.getWeight());
-            workoutLog.addExercise(cardio);
-        }
-
-        System.out.println("\nLog your strength training (type 'done' to finish):");
-        StrengthExerciseTemplates.printAvailableExercises();
-        while (true) {
-            System.out.print("Strength exercise: ");
-            String name = scanner.nextLine();
-            if (name.equalsIgnoreCase("done")) break;
-            if (!StrengthExerciseTemplates.isAvailable(name)) {
-                System.out.println("❌ Not found. Try again.");
-                continue;
+            // === NUTRITION LOG ===
+            NutritionLog nutritionLog = new NutritionLog(date);
+            System.out.println("\nLog your food for " + date + " (type 'done' to finish):");
+            FoodDatabase.printAvailableFoods();
+            while (true) {
+                System.out.print("Food name: ");
+                String input = scanner.nextLine();
+                if (input.equalsIgnoreCase("done")) break;
+                FoodItem item = FoodDatabase.getFood(input);
+                if (item != null) {
+                    nutritionLog.addFoodItem(item);
+                    System.out.println("✅ Added: " + item.getNutrients());
+                } else {
+                    System.out.println("❌ Food not found.");
+                }
             }
-            System.out.print("Duration (min): ");
-            int duration = Integer.parseInt(scanner.nextLine());
-            System.out.print("Sets: ");
-            int sets = Integer.parseInt(scanner.nextLine());
-            System.out.print("Reps per set: ");
-            int reps = Integer.parseInt(scanner.nextLine());
-            System.out.print("Weight used (kg): ");
-            double weight = Double.parseDouble(scanner.nextLine());
 
-            StrengthTraining st = new StrengthTraining(name, duration, sets, reps, weight);
-            workoutLog.addExercise(st);
+            // === WORKOUT LOG ===
+            WorkoutLog workoutLog = new WorkoutLog(date);
+            
+            // Cardio logging
+            System.out.println("\nLog your cardio for " + date + " (type 'done' to finish):");
+            ExerciseDatabase.printAvailableExercises();
+            while (true) {
+                System.out.print("Cardio type: ");
+                String type = scanner.nextLine();
+                if (type.equalsIgnoreCase("done")) break;
+                System.out.print("Duration (min): ");
+                int duration = Integer.parseInt(scanner.nextLine());
+                String intensity = ExerciseDatabase.getIntensity(type);
+                Cardio cardio = new Cardio(type, duration, type, intensity, user.getWeight());
+                workoutLog.addExercise(cardio);
+            }
+
+            // Strength training logging
+            System.out.println("\nLog your strength training for " + date + " (type 'done' to finish):");
+            StrengthExerciseTemplates.printAvailableExercises();
+            while (true) {
+                System.out.print("Strength exercise: ");
+                String name = scanner.nextLine();
+                if (name.equalsIgnoreCase("done")) break;
+                if (!StrengthExerciseTemplates.isAvailable(name)) {
+                    System.out.println("❌ Not found. Try again.");
+                    continue;
+                }
+                System.out.print("Duration (min): ");
+                int duration = Integer.parseInt(scanner.nextLine());
+                System.out.print("Sets: ");
+                int sets = Integer.parseInt(scanner.nextLine());
+                System.out.print("Reps per set: ");
+                int reps = Integer.parseInt(scanner.nextLine());
+                System.out.print("Weight used (kg): ");
+                double weight = Double.parseDouble(scanner.nextLine());
+
+                StrengthTraining st = new StrengthTraining(name, duration, sets, reps, weight);
+                workoutLog.addExercise(st);
+            }
+
+            // === SAVE DAILY DATA ===
+            DailySummary summary = new DailySummary();
+            summary.summarizeDay(nutritionLog, workoutLog, user.getDailyCalorieTarget());
+            
+            nutritionLogsByDate.put(date, nutritionLog);
+            workoutLogsByDate.put(date, workoutLog);
+            summaryList.add(summary);
+            
+            System.out.println("\n✅ Successfully saved data for " + date);
         }
-
-        // === DAILY SUMMARY ===
-        int caloriesIn = CalorieCalculator.calculateCaloriesConsumed(nutritionLog);
-        int caloriesOut = CalorieCalculator.calculateCaloriesBurned(workoutLog);
-        DailySummary summary = new DailySummary();
-        summary.summarizeDay(nutritionLog, workoutLog, user.getDailyCalorieTarget());
-
-        System.out.println("\n📊 Daily Summary for " + today);
-        System.out.println("Goal: " + user.getGoalDescription());
-        System.out.println("Calories In: " + caloriesIn);
-        System.out.println("Calories Out: " + caloriesOut);
-        System.out.println("Goal Met: " + (summary.isGoalMet() ? "✅ Yes" : "❌ No"));
-
-        // Save logs
-        nutritionLogsByDate.put(today, nutritionLog);
-        workoutLogsByDate.put(today, workoutLog);
-        summaryList.add(summary);
 
         // === VIEW LOGS BY DATE ===
         System.out.print("\nWould you like to view logs for a specific date? (yes/no): ");
@@ -304,7 +322,9 @@ public class Main {
             report.generateReport();
             report.printSummary();
 
-            GoalTracker tracker = new GoalTracker(user, new ArrayList<>(nutritionLogsByDate.values()), new ArrayList<>(workoutLogsByDate.values()));
+            GoalTracker tracker = new GoalTracker(user, 
+                new ArrayList<>(nutritionLogsByDate.values()), 
+                new ArrayList<>(workoutLogsByDate.values()));
             tracker.trackProgress();
         }
 

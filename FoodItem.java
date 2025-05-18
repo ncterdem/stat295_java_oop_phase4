@@ -1,4 +1,6 @@
-public class FoodItem {
+import java.io.Serializable;
+
+public class FoodItem implements Serializable{
     private String name;
     private int calories, protein, carbs, fat;
 

@@ -1,4 +1,6 @@
-public abstract class Exercise {
+import java.io.Serializable;
+
+public abstract class Exercise implements Serializable{
     protected String name;
     protected int duration; // in minutes
 

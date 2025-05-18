@@ -1,4 +1,6 @@
-public class StrengthTraining extends Exercise {
+import java.io.Serializable;
+
+public class StrengthTraining extends Exercise implements Serializable{
     private int sets, reps;
     private double weight;
     private double lastUsedWeight;

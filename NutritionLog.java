@@ -1,7 +1,8 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.io.Serializable;
 
-public class NutritionLog {
+public class NutritionLog implements Serializable {
     private String date;
     private List<FoodItem> foodItems = new ArrayList<>();
     private double waterIntake;

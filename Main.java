@@ -4,14 +4,23 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
+            // === LOAD EXISTING DATA ===
+        Object[] savedData = DataStorage.loadData();
+        Map<String, NutritionLog> nutritionLogsByDate = new HashMap<>();
+        Map<String, WorkoutLog> workoutLogsByDate = new HashMap<>();
+        List<DailySummary> summaryList = new ArrayList<>();
+
+        if (savedData != null) {
+            nutritionLogsByDate = (Map<String, NutritionLog>) savedData[0];
+            workoutLogsByDate = (Map<String, WorkoutLog>) savedData[1];
+            summaryList = (List<DailySummary>) savedData[2];
+            System.out.println("\n📂 Loaded previous session data");
+        }
+
         // === USER SETUP ===
         GoalType goal = GoalType.LOSE_WEIGHT; // change to GAIN_MUSCLE or MAINTAIN if needed
         User user = new User("Ali", 22, 1.75, 68, goal);
 
-        // === DATA STORAGE ===
-        Map<String, NutritionLog> nutritionLogsByDate = new HashMap<>();
-        Map<String, WorkoutLog> workoutLogsByDate = new HashMap<>();
-        List<DailySummary> summaryList = new ArrayList<>();
 
         // === MAIN LOGGING LOOP ===
         while (true) {
@@ -139,6 +148,10 @@ public class Main {
                 new ArrayList<>(workoutLogsByDate.values()));
             tracker.trackProgress();
         }
+        // Save all data before exiting
+        
+        DataStorage.saveData(nutritionLogsByDate, workoutLogsByDate, summaryList);
+        System.out.println("\n💾 Data saved successfully.");
 
         scanner.close();
     }
