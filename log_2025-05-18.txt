@@ -1,14 +1,3 @@
 === NUTRITION ===
-- Chickpeas | Calories: 269
-- Tofu | Calories: 144
-- Green Beans | Calories: 31
-- Orange | Calories: 62
 
 === WORKOUT ===
-- Cardio: running (30 min)
-- Cardio: running (30 min)
-- Cardio: walking (30 min)
-- Cardio: cycling (30 min)
-- StrengthTraining: squat (30 min)
-- StrengthTraining: deadlift (30 min)
-- StrengthTraining: pull up (30 min)

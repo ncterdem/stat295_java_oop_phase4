@@ -6,20 +6,20 @@ public class ExerciseDatabase {
     static final Map<String, String> intensityMap = new HashMap<>();
 
     static {
-        metValues.put("running", 9.8);
-        metValues.put("walking", 3.5);
-        metValues.put("cycling", 7.5);
-        metValues.put("swimming", 8.0);
+        metValues.put("Running", 9.8);
+        metValues.put("Walking", 3.5);
+        metValues.put("Cycling", 7.5);
+        metValues.put("Swimming", 8.0);
 
-        intensityMap.put("running", "high");
-        intensityMap.put("walking", "low");
-        intensityMap.put("cycling", "moderate");
-        intensityMap.put("swimming", "high");
+        intensityMap.put("Running", "high");
+        intensityMap.put("Walking", "low");
+        intensityMap.put("Cycling", "moderate");
+        intensityMap.put("Swimming", "high");
     }
 
 
     public static String getIntensity(String type) {
-        return intensityMap.getOrDefault(type.toLowerCase(), "moderate");
+        return intensityMap.getOrDefault(type, "moderate");
     }
 
     public static void printAvailableExercises() {

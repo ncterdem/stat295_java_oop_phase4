@@ -1,6 +1,12 @@
 import javax.swing.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import com.formdev.flatlaf.FlatLightLaf;
+
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.File;
@@ -19,7 +25,7 @@ public class FitnessGUI extends JFrame {
 
     public FitnessGUI() {
         setTitle("Fitness Tracker");
-        setSize(1200, 800);
+        setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -29,7 +35,15 @@ public class FitnessGUI extends JFrame {
         workoutLog = new WorkoutLog(today);
 
         // Configure tabs
-        JTabbedPane tabbedPane = new JTabbedPane();
+        JTabbedPane tabbedPane = new JTabbedPane() {
+        @Override
+        public Insets getInsets() {
+            // Adjust these values to move tabs up/down
+            return new Insets(10, 10, 10, 10); // TOP, LEFT, BOTTOM, RIGHT
+        }
+        };
+        tabbedPane.setTabPlacement(JTabbedPane.LEFT);
+        tabbedPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Top, Left, Bottom, Right
         tabbedPane.addTab("User", new UserPanel());
         tabbedPane.addTab("Nutrition", new NutritionPanel());
         tabbedPane.addTab("Workout", new WorkoutPanel());
@@ -50,7 +64,7 @@ public class FitnessGUI extends JFrame {
 
         public UserPanel() {
             setLayout(new GridLayout(6, 2, 10, 10));
-            setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+            setBorder(BorderFactory.createEmptyBorder(100, 100, 100, 100));
 
             nameField = new JTextField();
             ageSpinner = new JSpinner(new SpinnerNumberModel(25, 1, 120, 1));
@@ -491,6 +505,10 @@ public class FitnessGUI extends JFrame {
 
     // ================================= MAIN METHOD ================================= //
     public static void main(String[] args) {
+        FlatLightLaf.setup();
+        SwingUtilities.invokeLater(() -> new FitnessGUI().setVisible(true));
+
+
         SwingUtilities.invokeLater(() -> {
             FitnessGUI gui = new FitnessGUI();
             gui.setVisible(true);
