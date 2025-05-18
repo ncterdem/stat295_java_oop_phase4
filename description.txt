@@ -1,0 +1,672 @@
+// CalorieCalculator.java
+public class CalorieCalculator {
+    public static int calculateCaloriesConsumed(NutritionLog log) {
+        return log.getTotalCalories();
+    }
+
+    public static int calculateCaloriesBurned(WorkoutLog log) {
+        return log.getTotalCaloriesBurned();
+    }
+}
+
+// Cardio.java
+public class Cardio extends Exercise {
+    private String type;
+    private String intensity;
+    private double userWeight;
+
+    public Cardio(String name, int duration, String type, String intensity, double userWeight) {
+        super(name, duration);
+        this.type = type;
+        this.intensity = intensity;
+        this.userWeight = userWeight;
+    }
+
+    @Override
+    public int calculateCaloriesBurned() {
+        double met = switch (intensity.toLowerCase()) {
+            case "low" -> 4.0;
+            case "moderate" -> 6.0;
+            case "high" -> 8.0;
+            default -> 5.0;
+        };
+        return (int)(duration * met * userWeight * 0.0175);
+    }
+}
+
+// DailySummary.java
+public class DailySummary {
+    private String date;
+    private int totalCaloriesIn, totalCaloriesOut;
+    private boolean goalMet;
+
+    public void summarizeDay(NutritionLog nutrition, WorkoutLog workout, int target) {
+        this.totalCaloriesIn = nutrition.getTotalCalories();
+        this.totalCaloriesOut = workout.getTotalCaloriesBurned();
+        this.goalMet = (totalCaloriesIn - totalCaloriesOut) <= target;
+    }
+
+    public boolean isGoalMet() {
+        return goalMet;
+    }
+    public int getTotalCaloriesIn() {
+        return totalCaloriesIn;
+    }
+
+    public int getTotalCaloriesOut() {
+        return totalCaloriesOut;
+    }
+
+}
+
+// Exercise.java
+public abstract class Exercise {
+    protected String name;
+    protected int duration; // in minutes
+
+    public Exercise(String name, int duration) {
+        this.name = name;
+        this.duration = duration;
+    }
+
+    public abstract int calculateCaloriesBurned();
+}
+
+// ExerciseDatabase.java
+import java.util.HashMap;
+import java.util.Map;
+
+public class ExerciseDatabase {
+    private static final Map<String, Double> metValues = new HashMap<>();
+    private static final Map<String, String> intensityMap = new HashMap<>();
+
+    static {
+        metValues.put("running", 9.8);
+        metValues.put("walking", 3.5);
+        metValues.put("cycling", 7.5);
+        metValues.put("swimming", 8.0);
+
+        intensityMap.put("running", "high");
+        intensityMap.put("walking", "low");
+        intensityMap.put("cycling", "moderate");
+        intensityMap.put("swimming", "high");
+    }
+
+
+    public static String getIntensity(String type) {
+        return intensityMap.getOrDefault(type.toLowerCase(), "moderate");
+    }
+
+    public static void printAvailableExercises() {
+        System.out.println("Available cardio exercises: " + metValues.keySet());
+    }
+}
+
+// FoodDatabase.java
+import java.util.HashMap;
+import java.util.Map;
+
+public class FoodDatabase {
+    private static final Map<String, FoodItem> foodMap = new HashMap<>();
+
+    static {
+        foodMap.put("apple", new FoodItem("Apple", 95, 0, 25, 0));
+        foodMap.put("banana", new FoodItem("Banana", 105, 1, 27, 0));
+        foodMap.put("chicken breast", new FoodItem("Chicken Breast", 200, 30, 0, 5));
+        foodMap.put("rice", new FoodItem("Rice", 206, 4, 45, 0));
+        foodMap.put("egg", new FoodItem("Egg", 78, 6, 1, 5));
+        foodMap.put("salmon", new FoodItem("Salmon", 208, 22, 0, 13));
+        foodMap.put("broccoli", new FoodItem("Broccoli", 55, 4, 11, 0));
+        foodMap.put("oatmeal", new FoodItem("Oatmeal", 150, 5, 27, 3));
+        foodMap.put("peanut butter", new FoodItem("Peanut Butter", 190, 8, 6, 16));
+        foodMap.put("almonds", new FoodItem("Almonds", 164, 6, 6, 14));
+        foodMap.put("avocado", new FoodItem("Avocado", 234, 3, 12, 21));
+        foodMap.put("spinach", new FoodItem("Spinach", 23, 3, 4, 0));
+        foodMap.put("carrot", new FoodItem("Carrot", 25, 1, 6, 0));
+        foodMap.put("potato", new FoodItem("Potato", 163, 4, 37, 0));
+        foodMap.put("sweet potato", new FoodItem("Sweet Potato", 112, 2, 26, 0));
+        foodMap.put("yogurt", new FoodItem("Yogurt", 100, 6, 8, 4));
+        foodMap.put("greek yogurt", new FoodItem("Greek Yogurt", 120, 12, 8, 5));
+        foodMap.put("beef", new FoodItem("Beef", 250, 26, 0, 18));
+        foodMap.put("pasta", new FoodItem("Pasta", 221, 8, 43, 1));
+        foodMap.put("cheese", new FoodItem("Cheese", 113, 7, 1, 9));
+        foodMap.put("milk", new FoodItem("Milk", 103, 8, 12, 2));
+        foodMap.put("soy milk", new FoodItem("Soy Milk", 100, 7, 10, 4));
+        foodMap.put("orange", new FoodItem("Orange", 62, 1, 15, 0));
+        foodMap.put("grapes", new FoodItem("Grapes", 62, 1, 16, 0));
+        foodMap.put("strawberries", new FoodItem("Strawberries", 49, 1, 12, 0));
+        foodMap.put("blueberries", new FoodItem("Blueberries", 57, 1, 14, 0));
+        foodMap.put("watermelon", new FoodItem("Watermelon", 46, 1, 12, 0));
+        foodMap.put("tuna", new FoodItem("Tuna", 132, 28, 0, 1));
+        foodMap.put("tofu", new FoodItem("Tofu", 144, 15, 3, 9));
+        foodMap.put("lentils", new FoodItem("Lentils", 230, 18, 40, 1));
+        foodMap.put("black beans", new FoodItem("Black Beans", 227, 15, 41, 1));
+        foodMap.put("chickpeas", new FoodItem("Chickpeas", 269, 15, 45, 4));
+        foodMap.put("brown rice", new FoodItem("Brown Rice", 216, 5, 45, 2));
+        foodMap.put("quinoa", new FoodItem("Quinoa", 222, 8, 39, 3));
+        foodMap.put("corn", new FoodItem("Corn", 96, 3, 21, 1));
+        foodMap.put("cucumber", new FoodItem("Cucumber", 16, 1, 4, 0));
+        foodMap.put("onion", new FoodItem("Onion", 44, 1, 10, 0));
+        foodMap.put("tomato", new FoodItem("Tomato", 22, 1, 5, 0));
+        foodMap.put("mushrooms", new FoodItem("Mushrooms", 22, 3, 3, 0));
+        foodMap.put("zucchini", new FoodItem("Zucchini", 17, 1, 3, 0));
+        foodMap.put("eggplant", new FoodItem("Eggplant", 25, 1, 6, 0));
+        foodMap.put("green beans", new FoodItem("Green Beans", 31, 2, 7, 0));
+        foodMap.put("asparagus", new FoodItem("Asparagus", 20, 2, 4, 0));
+        foodMap.put("cabbage", new FoodItem("Cabbage", 22, 1, 5, 0));
+        foodMap.put("cauliflower", new FoodItem("Cauliflower", 25, 2, 5, 0));
+        foodMap.put("bell pepper", new FoodItem("Bell Pepper", 31, 1, 7, 0));
+        foodMap.put("pumpkin", new FoodItem("Pumpkin", 50, 1, 12, 0));
+        foodMap.put("pear", new FoodItem("Pear", 101, 1, 27, 0));
+        foodMap.put("kiwi", new FoodItem("Kiwi", 42, 1, 10, 0));
+    }
+
+    public static FoodItem getFood(String name) {
+        return foodMap.get(name.toLowerCase());
+    }
+
+    public static void printAvailableFoods() {
+        System.out.println("Available foods: " + foodMap.keySet());
+    }
+}
+
+// FoodItem.java
+import java.util.ArrayList;
+import java.util.List;
+
+public class FoodItem {
+    private List<FoodItem> foodItems = new ArrayList<>();
+    private String name;
+    private int calories, protein, carbs, fat;
+
+    public FoodItem(String name, int calories, int protein, int carbs, int fat) {
+        this.name = name;
+        this.calories = calories;
+        this.protein = protein;
+        this.carbs = carbs;
+        this.fat = fat;
+    }
+
+    public int getCalories() { return calories; }
+    public String getNutrients() {
+        return "Protein: " + protein + "g, Carbs: " + carbs + "g, Fat: " + fat + "g";
+    }
+    public String getName() {
+        return name;
+    }
+
+
+
+    public int getProtein() {
+        return protein;
+    }
+
+    public int getCarbs() {
+        return carbs;
+    }
+
+    public int getFat() {
+        return fat;
+    }
+    public List<FoodItem> getFoodItems() {
+        return foodItems;
+    }
+}
+
+// GoalTracker.java
+import java.util.List;
+
+public class GoalTracker {
+    private User user;
+    private List<NutritionLog> nutritionLogs;
+    private List<WorkoutLog> workoutLogs;
+
+    public GoalTracker(User user, List<NutritionLog> nutritionLogs, List<WorkoutLog> workoutLogs) {
+        this.user = user;
+        this.nutritionLogs = nutritionLogs;
+        this.workoutLogs = workoutLogs;
+    }
+
+    public void trackProgress() {
+        if (nutritionLogs.isEmpty() || workoutLogs.isEmpty()) {
+            System.out.println("No data available to track progress.");
+            return;
+        }
+
+        int totalIn = 0;
+        int totalOut = 0;
+
+        for (int i = 0; i < nutritionLogs.size(); i++) {
+            totalIn += nutritionLogs.get(i).getTotalCalories();
+            totalOut += workoutLogs.get(i).getTotalCaloriesBurned();
+        }
+
+        int net = totalIn - totalOut;
+        int avgNet = net / nutritionLogs.size();
+        int target = user.getDailyCalorieTarget();
+
+        String result = switch (user.getGoalType()) {
+            case LOSE_WEIGHT -> (avgNet < target) ? "✅ On track to lose weight" : "⚠️ Too much intake";
+            case GAIN_MUSCLE -> (avgNet > target) ? "✅ On track to gain muscle" : "⚠️ Not eating enough";
+            case MAINTAIN -> Math.abs(avgNet - target) < 100 ? "✅ Maintaining well" : "⚠️ Needs adjustment";
+        };
+
+        System.out.println("📈 Goal Tracker Result: " + result);
+    }
+}
+
+// GoalType.java
+public enum GoalType {
+    LOSE_WEIGHT,
+    GAIN_MUSCLE,
+    MAINTAIN
+}
+
+// Main.java
+import java.io.*;
+import java.time.LocalDate;
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        String today = LocalDate.now().toString();
+
+        // === USER SETUP ===
+        User user = loadUser();
+
+        if (user == null) {
+            System.out.print("Enter your name: ");
+            String name = scanner.nextLine();
+            System.out.print("Enter your age: ");
+            int age = Integer.parseInt(scanner.nextLine());
+            System.out.print("Enter your height (m): ");
+            double height = Double.parseDouble(scanner.nextLine());
+            System.out.print("Enter your current weight (kg): ");
+            double weight = Double.parseDouble(scanner.nextLine());
+
+            System.out.println("Choose your goal: 1) Lose Weight 2) Gain Muscle 3) Maintain");
+            int g = Integer.parseInt(scanner.nextLine());
+            GoalType goal = switch (g) {
+                case 1 -> GoalType.LOSE_WEIGHT;
+                case 2 -> GoalType.GAIN_MUSCLE;
+                default -> GoalType.MAINTAIN;
+            };
+
+            user = new User(name, age, height, weight, goal);
+            saveUser(user);
+        }
+
+        // === NUTRITION LOG ===
+        NutritionLog nutritionLog = new NutritionLog(today);
+        System.out.println("Log your food (type 'done' to finish):");
+        FoodDatabase.printAvailableFoods();
+
+        while (true) {
+            System.out.print("Food name: ");
+            String nameInput = scanner.nextLine();
+            if (nameInput.equalsIgnoreCase("done")) break;
+
+            FoodItem baseItem = FoodDatabase.getFood(nameInput);
+            if (baseItem != null) {
+                System.out.print("How many portions did you eat? ");
+                int portions = Integer.parseInt(scanner.nextLine());
+
+                FoodItem adjustedItem = new FoodItem(
+                        baseItem.getName(),
+                        baseItem.getCalories() * portions,
+                        baseItem.getProtein() * portions,
+                        baseItem.getCarbs() * portions,
+                        baseItem.getFat() * portions
+                );
+
+                nutritionLog.addFoodItem(adjustedItem);
+                System.out.println("✅ Logged: " + portions + "x " + baseItem.getName());
+            } else {
+                System.out.println("❌ Food not found.");
+            }
+        }
+
+        // === WORKOUT LOG ===
+        WorkoutLog workoutLog = new WorkoutLog(today);
+
+        System.out.println("\nLog your cardio (type 'done' to finish):");
+        ExerciseDatabase.printAvailableExercises();
+        while (true) {
+            System.out.print("Cardio type: ");
+            String type = scanner.nextLine();
+            if (type.equalsIgnoreCase("done")) break;
+
+            System.out.print("Duration (min): ");
+            int duration = Integer.parseInt(scanner.nextLine());
+            String intensity = ExerciseDatabase.getIntensity(type);
+
+            Cardio cardio = new Cardio(type, duration, type, intensity, user.getWeight());
+            workoutLog.addExercise(cardio);
+        }
+
+        System.out.println("\nLog your strength training (type 'done' to finish):");
+        StrengthExerciseTemplates.printAvailableExercises();
+        while (true) {
+            System.out.print("Strength exercise: ");
+            String exercise = scanner.nextLine();
+            if (exercise.equalsIgnoreCase("done")) break;
+
+            if (!StrengthExerciseTemplates.isAvailable(exercise)) {
+                System.out.println("❌ Not found. Try again.");
+                continue;
+            }
+
+            System.out.print("Duration (min): ");
+            int duration = Integer.parseInt(scanner.nextLine());
+            System.out.print("Sets: ");
+            int sets = Integer.parseInt(scanner.nextLine());
+            System.out.print("Reps per set: ");
+            int reps = Integer.parseInt(scanner.nextLine());
+            System.out.print("Weight used (kg): ");
+            double usedWeight = Double.parseDouble(scanner.nextLine());
+
+            StrengthTraining st = new StrengthTraining(exercise, duration, sets, reps, usedWeight);
+            workoutLog.addExercise(st);
+        }
+
+        // === DAILY SUMMARY ===
+        int caloriesIn = CalorieCalculator.calculateCaloriesConsumed(nutritionLog);
+        int caloriesOut = CalorieCalculator.calculateCaloriesBurned(workoutLog);
+
+        DailySummary summary = new DailySummary();
+        summary.summarizeDay(nutritionLog, workoutLog, user.getDailyCalorieTarget());
+
+        System.out.println("\n📊 Summary for " + today);
+        System.out.println("Calories In:  " + caloriesIn);
+        System.out.println("Calories Out: " + caloriesOut);
+        System.out.println("Goal Met: " + (summary.isGoalMet() ? "✅ Yes" : "❌ No"));
+
+        // === SAVE DAILY LOG ===
+        saveDailyLog(today, nutritionLog, workoutLog);
+
+        // === VIEW PAST LOG ===
+        System.out.print("\nWould you like to view a previous log? (yes/no): ");
+        String answer = scanner.nextLine();
+        if (answer.equalsIgnoreCase("yes")) {
+            System.out.print("Enter the date (YYYY-MM-DD): ");
+            String date = scanner.nextLine();
+            loadDailyLog(date);
+        }
+
+        scanner.close();
+    }
+
+    public static void saveDailyLog(String date, NutritionLog nlog, WorkoutLog wlog) {
+        try (PrintWriter out = new PrintWriter("log_" + date + ".txt")) {
+            out.println("=== NUTRITION ===");
+            for (FoodItem f : nlog.getFoodItems()) {
+                out.println("- " + f.getName() + " | Calories: " + f.getCalories());
+            }
+
+            out.println("\n=== WORKOUT ===");
+            for (Exercise ex : wlog.getExercises()) {
+                out.println("- " + ex.getClass().getSimpleName() + ": " + ex.name + " (" + ex.duration + " min)");
+            }
+        } catch (IOException e) {
+            System.out.println("❌ Failed to save daily log.");
+        }
+    }
+
+    public static void loadDailyLog(String date) {
+        File file = new File("log_" + date + ".txt");
+
+        if (!file.exists()) {
+            System.out.println("⚠️ No log found for " + date);
+            return;
+        }
+
+        System.out.println("\n📖 Log for " + date + ":");
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+        } catch (IOException e) {
+            System.out.println("❌ Failed to read log for " + date);
+        }
+    }
+    public static void saveUser(User user) {
+        try (PrintWriter writer = new PrintWriter("user.txt")) {
+            writer.println(user.getName());
+            writer.println(user.getAge());
+            writer.println(user.getHeight());
+            writer.println(user.getWeight());
+            writer.println(user.getGoalType()); // enum name: LOSE_WEIGHT, etc.
+        } catch (IOException e) {
+            System.out.println("❌ Failed to save user data.");
+        }
+    }
+
+    public static User loadUser() {
+        File file = new File("user.txt");
+        if (!file.exists()) return null;
+
+        try (Scanner fileScanner = new Scanner(file)) {
+            String name = fileScanner.nextLine();
+            int age = Integer.parseInt(fileScanner.nextLine());
+            double height = Double.parseDouble(fileScanner.nextLine());
+            double weight = Double.parseDouble(fileScanner.nextLine());
+            GoalType goal = GoalType.valueOf(fileScanner.nextLine());
+
+            return new User(name, age, height, weight, goal);
+        } catch (Exception e) {
+            System.out.println("⚠️ Failed to load user data. Re-entering info...");
+            return null;
+        }
+    }
+}
+
+// NutritionLog.java
+import java.util.*;
+
+public class NutritionLog {
+    private String date;
+    private List<FoodItem> foodItems;
+
+    public NutritionLog(String date) {
+        this.date = date;
+        this.foodItems = new ArrayList<>();
+    }
+
+    public void addFoodItem(FoodItem item) {
+        foodItems.add(item);
+    }
+
+    public List<FoodItem> getFoodItems() {
+        return foodItems;
+    }
+
+    public int getTotalCalories() {
+        return foodItems.stream().mapToInt(FoodItem::getCalories).sum();
+    }
+}
+
+// NutritionLog.java
+import java.util.*;
+
+public class NutritionLog {
+    private String date;
+    private List<FoodItem> foodItems;
+
+    public NutritionLog(String date) {
+        this.date = date;
+        this.foodItems = new ArrayList<>();
+    }
+
+    public void addFoodItem(FoodItem item) {
+        foodItems.add(item);
+    }
+
+    public List<FoodItem> getFoodItems() {
+        return foodItems;
+    }
+
+    public int getTotalCalories() {
+        return foodItems.stream().mapToInt(FoodItem::getCalories).sum();
+    }
+}
+
+// ProgressReport.java
+import java.util.List;
+
+public class ProgressReport {
+    private String timePeriod;
+    private List<DailySummary> dailySummaries;
+    private double averageCaloriesIn;
+    private double averageCaloriesOut;
+
+    public ProgressReport(String timePeriod, List<DailySummary> dailySummaries) {
+        this.timePeriod = timePeriod;
+        this.dailySummaries = dailySummaries;
+    }
+
+    public void generateReport() {
+        int totalIn = 0, totalOut = 0;
+        for (DailySummary ds : dailySummaries) {
+            totalIn += ds.getTotalCaloriesIn();
+            totalOut += ds.getTotalCaloriesOut();
+        }
+        int count = dailySummaries.size();
+        this.averageCaloriesIn = count > 0 ? (double) totalIn / count : 0;
+        this.averageCaloriesOut = count > 0 ? (double) totalOut / count : 0;
+    }
+
+    public void printSummary() {
+        System.out.println("\n📊 Progress Report: " + timePeriod);
+        System.out.println("Average Calories In:  " + averageCaloriesIn);
+        System.out.println("Average Calories Out: " + averageCaloriesOut);
+        System.out.println("Days Tracked: " + dailySummaries.size());
+    }
+}
+
+// StrengthExerciseTemplates.java
+import java.util.List;
+
+public class StrengthExerciseTemplates {
+    private static final List<String> availableExercises = List.of(
+            "squat", "bench press", "deadlift", "shoulder press", "pull up"
+    );
+
+    public static boolean isAvailable(String name) {
+        return availableExercises.contains(name.toLowerCase());
+    }
+
+    public static void printAvailableExercises() {
+        System.out.println("Available strength exercises: " + availableExercises);
+    }
+}
+
+// StrengthTrainingDatabase.java
+import java.util.HashMap;
+import java.util.Map;
+
+public class StrengthTrainingDatabase {
+    private static final Map<String, StrengthTraining> strengthMap = new HashMap<>();
+
+    static {
+        strengthMap.put("squat", new StrengthTraining("Squat", 15, 3, 10, 60));
+        strengthMap.put("bench press", new StrengthTraining("Bench Press", 20, 3, 8, 50));
+        strengthMap.put("deadlift", new StrengthTraining("Deadlift", 15, 3, 5, 80));
+        strengthMap.put("shoulder press", new StrengthTraining("Shoulder Press", 20, 3, 8, 50));
+        strengthMap.put("pull up", new StrengthTraining("Pull Up", 20, 3, 8, 50));
+    }
+
+
+    public static void printAvailableStrengthExercises() {
+        System.out.println("Available strength exercises: " + strengthMap.keySet());
+    }
+}
+
+// User.java
+public class User {
+    private String name;
+    private int age;
+    private double height; // in meters
+    private double weight; // in kg
+    private GoalType goalType;
+    private int dailyCalorieTarget;
+
+    public User(String name, int age, double height, double weight, GoalType goalType) {
+        this.name = name;
+        this.age = age;
+        this.height = height;
+        this.weight = weight;
+        this.goalType = goalType;
+        this.dailyCalorieTarget = calculateCalorieTarget();
+    }
+
+    private int calculateCalorieTarget() {
+        double bmr = 10 * weight + 6.25 * height * 100 - 5 * age + 5; // Mifflin-St Jeor formula
+        return switch (goalType) {
+            case LOSE_WEIGHT -> (int)(bmr - 500);
+            case GAIN_MUSCLE -> (int)(bmr + 300);
+            case MAINTAIN -> (int)(bmr);
+        };
+    }
+
+    public double getBMI() {
+        return weight / (height * height);
+    }
+
+    public double getWeight() { return weight; }
+
+    public int getDailyCalorieTarget() { return dailyCalorieTarget; }
+
+    public GoalType getGoalType() { return goalType; }
+
+    public String getGoalDescription() {
+        return switch (goalType) {
+            case LOSE_WEIGHT -> "Lose Weight";
+            case GAIN_MUSCLE -> "Gain Muscle";
+            case MAINTAIN -> "Maintain Weight";
+        };
+    }
+    public String getName() {
+        return name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
+
+}
+
+// WorkoutLog.java
+import java.util.ArrayList;
+import java.util.List;
+
+public class WorkoutLog {
+    private String date;
+    private List<Exercise> exercises = new ArrayList<>();
+
+    public WorkoutLog(String date) {
+        this.date = date;
+    }
+
+    public void addExercise(Exercise exercise) {
+        exercises.add(exercise);
+    }
+
+    public int getTotalCaloriesBurned() {
+        int total = 0;
+        for (Exercise e : exercises) {
+            total += e.calculateCaloriesBurned();
+        }
+        return total;
+    }
+    public List<Exercise> getExercises() {
+        return exercises;
+    }
+
+}

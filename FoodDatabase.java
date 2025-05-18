@@ -2,7 +2,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FoodDatabase {
-    private static final Map<String, FoodItem> foodMap = new HashMap<>();
+    public static final Map<String, FoodItem> foodMap = new HashMap<>();
 
     static {
         foodMap.put("apple", new FoodItem("Apple", 95, 0, 25, 0));

@@ -1,6 +1,6 @@
 === NUTRITION ===
-- Eggplant | Calories: 50
+- Rice | Calories: 4120
 
 === WORKOUT ===
-- Cardio: running (30 min)
+- Cardio: running (200 min)
 - StrengthTraining: squat (30 min)
