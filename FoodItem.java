@@ -1,6 +1,8 @@
-import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-public class FoodItem implements Serializable{
+public class FoodItem {
+    private List<FoodItem> foodItems = new ArrayList<>();
     private String name;
     private int calories, protein, carbs, fat;
 
@@ -15,5 +17,25 @@ public class FoodItem implements Serializable{
     public int getCalories() { return calories; }
     public String getNutrients() {
         return "Protein: " + protein + "g, Carbs: " + carbs + "g, Fat: " + fat + "g";
+    }
+    public String getName() {
+        return name;
+    }
+
+
+
+    public int getProtein() {
+        return protein;
+    }
+
+    public int getCarbs() {
+        return carbs;
+    }
+
+    public int getFat() {
+        return fat;
+    }
+    public List<FoodItem> getFoodItems() {
+        return foodItems;
     }
 }

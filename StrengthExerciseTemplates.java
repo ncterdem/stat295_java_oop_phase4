@@ -1,12 +1,12 @@
 import java.util.List;
 
 public class StrengthExerciseTemplates {
-    private static final List<String> availableExercises = List.of(
-            "squat", "bench press", "deadlift", "shoulder press", "pull up"
+    static final List<String> availableExercises = List.of(
+            "Squat", "Bench Press", "Deadlift", "Shoulder Press", "Pull Up"
     );
 
     public static boolean isAvailable(String name) {
-        return availableExercises.contains(name.toLowerCase());
+        return availableExercises.contains(name);
     }
 
     public static void printAvailableExercises() {

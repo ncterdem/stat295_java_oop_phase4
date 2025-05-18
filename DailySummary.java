@@ -1,6 +1,4 @@
-import java.io.Serializable;
-
-public class DailySummary implements Serializable{
+public class DailySummary {
     private String date;
     private int totalCaloriesIn, totalCaloriesOut;
     private boolean goalMet;

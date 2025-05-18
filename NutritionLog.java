@@ -1,29 +1,23 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.io.Serializable;
+import java.util.*;
 
-public class NutritionLog implements Serializable {
+public class NutritionLog {
     private String date;
-    private List<FoodItem> foodItems = new ArrayList<>();
-    private double waterIntake;
+    private List<FoodItem> foodItems;
 
     public NutritionLog(String date) {
         this.date = date;
+        this.foodItems = new ArrayList<>();
     }
 
     public void addFoodItem(FoodItem item) {
         foodItems.add(item);
     }
 
-    public int getTotalCalories() {
-        int total = 0;
-        for (FoodItem item : foodItems) {
-            total += item.getCalories();
-        }
-        return total;
+    public List<FoodItem> getFoodItems() {
+        return foodItems;
     }
 
-    public void logWater(double amount) {
-        waterIntake += amount;
+    public int getTotalCalories() {
+        return foodItems.stream().mapToInt(FoodItem::getCalories).sum();
     }
 }

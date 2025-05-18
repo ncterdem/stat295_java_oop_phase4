@@ -1,0 +1,11 @@
+=== NUTRITION ===
+- Soy Milk | Calories: 100
+- Potato | Calories: 163
+- Beef | Calories: 250
+- Green Beans | Calories: 31
+- Green Beans | Calories: 31
+
+=== WORKOUT ===
+- StrengthTraining: Bench Press (34 min)
+- StrengthTraining: Bench Press (34 min)
+- StrengthTraining: Bench Press (34 min)
