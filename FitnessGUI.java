@@ -15,14 +15,15 @@ public class FitnessGUI extends JFrame {
     private NutritionLog nutritionLog;
     private WorkoutLog workoutLog;
     private final String today = LocalDate.now().toString();
+    private HistoryPanel historyPanel;
 
     public FitnessGUI() {
         setTitle("Fitness Tracker");
-        setSize(1000, 700);
+        setSize(1200, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Load existing user or create new
+        // Initialize core components
         currentUser = Main.loadUser();
         nutritionLog = new NutritionLog(today);
         workoutLog = new WorkoutLog(today);
@@ -33,12 +34,14 @@ public class FitnessGUI extends JFrame {
         tabbedPane.addTab("Nutrition", new NutritionPanel());
         tabbedPane.addTab("Workout", new WorkoutPanel());
         tabbedPane.addTab("Summary", new SummaryPanel());
-        tabbedPane.addTab("History", new HistoryPanel());
+        
+        historyPanel = new HistoryPanel();
+        tabbedPane.addTab("History", historyPanel);
 
         add(tabbedPane);
     }
 
-    // ================== INNER PANEL CLASSES ================== //
+    // ================================= INNER PANELS ================================= //
 
     private class UserPanel extends JPanel {
         private JTextField nameField;
@@ -49,23 +52,18 @@ public class FitnessGUI extends JFrame {
             setLayout(new GridLayout(6, 2, 10, 10));
             setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-            // Initialize components
             nameField = new JTextField();
             ageSpinner = new JSpinner(new SpinnerNumberModel(25, 1, 120, 1));
             heightSpinner = new JSpinner(new SpinnerNumberModel(1.7, 0.5, 2.5, 0.1));
             weightSpinner = new JSpinner(new SpinnerNumberModel(70.0, 30.0, 200.0, 0.5));
             goalCombo = new JComboBox<>(GoalType.values());
 
-            // Load existing user data
-            if (currentUser != null) {
-                nameField.setText(currentUser.getName());
-                ageSpinner.setValue(currentUser.getAge());
-                heightSpinner.setValue(currentUser.getHeight());
-                weightSpinner.setValue(currentUser.getWeight());
-                goalCombo.setSelectedItem(currentUser.getGoalType());
-            }
+            if (currentUser != null) loadUserData();
 
-            // Add components
+            addComponents();
+        }
+
+        private void addComponents() {
             add(new JLabel("Name:"));
             add(nameField);
             add(new JLabel("Age:"));
@@ -80,6 +78,14 @@ public class FitnessGUI extends JFrame {
             JButton saveBtn = new JButton("Save Profile");
             saveBtn.addActionListener(e -> saveUser());
             add(saveBtn);
+        }
+
+        private void loadUserData() {
+            nameField.setText(currentUser.getName());
+            ageSpinner.setValue(currentUser.getAge());
+            heightSpinner.setValue(currentUser.getHeight());
+            weightSpinner.setValue(currentUser.getWeight());
+            goalCombo.setSelectedItem(currentUser.getGoalType());
         }
 
         private void saveUser() {
@@ -104,24 +110,19 @@ public class FitnessGUI extends JFrame {
             setLayout(new BorderLayout(10, 10));
             setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-            // Food selection
+            initializeComponents();
+            setupLayout();
+        }
+
+        private void initializeComponents() {
             DefaultListModel<String> foodModel = new DefaultListModel<>();
             FoodDatabase.foodMap.keySet().forEach(foodModel::addElement);
             foodList = new JList<>(foodModel);
-            foodList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-            // Portion selection
             portionSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
-
-            // Logged items
             logModel = new DefaultListModel<>();
-            JList<String> logList = new JList<>(logModel);
+        }
 
-            // Buttons
-            JButton addBtn = new JButton("Add Food");
-            addBtn.addActionListener(e -> addFood());
-
-            // Layout
+        private void setupLayout() {
             JPanel inputPanel = new JPanel(new BorderLayout(10, 10));
             inputPanel.add(new JLabel("Select Food:"), BorderLayout.NORTH);
             inputPanel.add(new JScrollPane(foodList), BorderLayout.CENTER);
@@ -129,7 +130,10 @@ public class FitnessGUI extends JFrame {
 
             JPanel logPanel = new JPanel(new BorderLayout(10, 10));
             logPanel.add(new JLabel("Logged Items:"), BorderLayout.NORTH);
-            logPanel.add(new JScrollPane(logList), BorderLayout.CENTER);
+            logPanel.add(new JScrollPane(new JList<>(logModel)), BorderLayout.CENTER);
+
+            JButton addBtn = new JButton("Add Food");
+            addBtn.addActionListener(e -> addFood());
 
             add(inputPanel, BorderLayout.WEST);
             add(addBtn, BorderLayout.CENTER);
@@ -169,7 +173,7 @@ public class FitnessGUI extends JFrame {
         }
     }
 
-        private class CardioPanel extends JPanel {
+    private class CardioPanel extends JPanel {
         private JComboBox<String> exerciseCombo;
         private JSpinner durationSpinner;
         private JLabel intensityLabel;
@@ -179,25 +183,19 @@ public class FitnessGUI extends JFrame {
             setLayout(new BorderLayout(10, 10));
             setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-            // Exercise selection
+            initializeComponents();
+            setupLayout();
+        }
+
+        private void initializeComponents() {
             exerciseCombo = new JComboBox<>(ExerciseDatabase.metValues.keySet().toArray(new String[0]));
-            exerciseCombo.addActionListener(e -> updateIntensityDisplay());
-            
-            // Intensity display
-            intensityLabel = new JLabel("Intensity: ");
-            
-            // Duration input
             durationSpinner = new JSpinner(new SpinnerNumberModel(30, 1, 240, 1));
-            
-            // Log list
+            intensityLabel = new JLabel("Intensity: ");
             logModel = new DefaultListModel<>();
-            JList<String> logList = new JList<>(logModel);
+        }
 
-            // Add button
-            JButton addBtn = new JButton("Add Cardio Session");
-            addBtn.addActionListener(e -> addCardioExercise());
-
-            // Input panel
+        private void setupLayout() {
+            exerciseCombo.addActionListener(e -> updateIntensity());
             JPanel inputPanel = new JPanel(new GridLayout(3, 2, 10, 10));
             inputPanel.add(new JLabel("Exercise Type:"));
             inputPanel.add(exerciseCombo);
@@ -206,46 +204,42 @@ public class FitnessGUI extends JFrame {
             inputPanel.add(new JLabel("Intensity Level:"));
             inputPanel.add(intensityLabel);
 
-            // Layout
+            JButton addBtn = new JButton("Add Cardio Session");
+            addBtn.addActionListener(e -> addCardio());
+
             add(inputPanel, BorderLayout.NORTH);
-            add(new JScrollPane(logList), BorderLayout.CENTER);
+            add(new JScrollPane(new JList<>(logModel)), BorderLayout.CENTER);
             add(addBtn, BorderLayout.SOUTH);
 
-            updateIntensityDisplay();
+            updateIntensity();
         }
 
-        private void updateIntensityDisplay() {
-            String selected = (String) exerciseCombo.getSelectedItem();
-            String intensity = ExerciseDatabase.getIntensity(selected);
-            intensityLabel.setText("Intensity: " + intensity.toUpperCase());
+        private void updateIntensity() {
+            String exercise = (String) exerciseCombo.getSelectedItem();
+            intensityLabel.setText("Intensity: " + ExerciseDatabase.getIntensity(exercise).toUpperCase());
         }
 
-        private void addCardioExercise() {
+        private void addCardio() {
             if (currentUser == null) {
                 JOptionPane.showMessageDialog(this, "Complete user profile first!", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             String type = (String) exerciseCombo.getSelectedItem();
-            int duration = (int) durationSpinner.getValue();
-            String intensity = ExerciseDatabase.getIntensity(type);
-            double weight = currentUser.getWeight();
-
             Cardio cardio = new Cardio(
-                type, 
-                duration, 
-                type,  // Pass type as both name and exercise type
-                intensity, 
-                weight
+                type,
+                (int) durationSpinner.getValue(),
+                type,
+                ExerciseDatabase.getIntensity(type),
+                currentUser.getWeight()
             );
-            
             workoutLog.addExercise(cardio);
             logModel.addElement(String.format("%s - %d min (%d kcal)", 
-                type, duration, cardio.calculateCaloriesBurned()));
+                type, cardio.duration, cardio.calculateCaloriesBurned()));
         }
     }
 
-   private class StrengthPanel extends JPanel {
+    private class StrengthPanel extends JPanel {
         private JComboBox<String> exerciseCombo;
         private JSpinner durationSpinner, setsSpinner, repsSpinner, weightSpinner;
         private DefaultListModel<String> logModel;
@@ -254,26 +248,21 @@ public class FitnessGUI extends JFrame {
             setLayout(new BorderLayout(10, 10));
             setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-            // Exercise selection
+            initializeComponents();
+            setupLayout();
+        }
+
+        private void initializeComponents() {
             exerciseCombo = new JComboBox<>(
-                StrengthExerciseTemplates.availableExercises.toArray(new String[0])
-            );
-            
-            // Input fields
+                StrengthExerciseTemplates.availableExercises.toArray(new String[0]));
             durationSpinner = new JSpinner(new SpinnerNumberModel(30, 1, 240, 1));
             setsSpinner = new JSpinner(new SpinnerNumberModel(3, 1, 10, 1));
             repsSpinner = new JSpinner(new SpinnerNumberModel(10, 1, 50, 1));
             weightSpinner = new JSpinner(new SpinnerNumberModel(20.0, 0.0, 500.0, 2.5));
-            
-            // Log list
             logModel = new DefaultListModel<>();
-            JList<String> logList = new JList<>(logModel);
+        }
 
-            // Add button
-            JButton addBtn = new JButton("Add Strength Session");
-            addBtn.addActionListener(e -> addStrengthExercise());
-
-            // Input panel
+        private void setupLayout() {
             JPanel inputPanel = new JPanel(new GridLayout(5, 2, 10, 10));
             inputPanel.add(new JLabel("Exercise:"));
             inputPanel.add(exerciseCombo);
@@ -286,30 +275,26 @@ public class FitnessGUI extends JFrame {
             inputPanel.add(new JLabel("Weight (kg):"));
             inputPanel.add(weightSpinner);
 
-            // Layout
+            JButton addBtn = new JButton("Add Strength Session");
+            addBtn.addActionListener(e -> addStrength());
+
             add(inputPanel, BorderLayout.NORTH);
-            add(new JScrollPane(logList), BorderLayout.CENTER);
+            add(new JScrollPane(new JList<>(logModel)), BorderLayout.CENTER);
             add(addBtn, BorderLayout.SOUTH);
         }
 
-        private void addStrengthExercise() {
-            String exercise = (String) exerciseCombo.getSelectedItem();
-            int duration = (int) durationSpinner.getValue();
-            int sets = (int) setsSpinner.getValue();
-            int reps = (int) repsSpinner.getValue();
-            double weight = (double) weightSpinner.getValue();
-
+        private void addStrength() {
             StrengthTraining session = new StrengthTraining(
-                exercise,
-                duration,
-                sets,
-                reps,
-                weight
+                (String) exerciseCombo.getSelectedItem(),
+                (int) durationSpinner.getValue(),
+                (int) setsSpinner.getValue(),
+                (int) repsSpinner.getValue(),
+                (double) weightSpinner.getValue()
             );
-
             workoutLog.addExercise(session);
             logModel.addElement(String.format("%s - %d×%d @ %.1fkg (%d kcal)", 
-                exercise, sets, reps, weight, session.calculateCaloriesBurned()));
+                session.name, session.sets, session.reps, session.weight, 
+                session.calculateCaloriesBurned()));
         }
     }
 
@@ -317,20 +302,31 @@ public class FitnessGUI extends JFrame {
         private JLabel caloriesInLabel, caloriesOutLabel, goalStatusLabel;
 
         public SummaryPanel() {
-            setLayout(new GridLayout(4, 1, 10, 10));
+            setLayout(new GridLayout(5, 1, 10, 10));
             setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
+            initializeComponents();
+            setupLayout();
+        }
+
+        private void initializeComponents() {
             caloriesInLabel = new JLabel("Calories In: --");
             caloriesOutLabel = new JLabel("Calories Out: --");
             goalStatusLabel = new JLabel("Goal Status: --");
+        }
 
+        private void setupLayout() {
             JButton refreshBtn = new JButton("Refresh Summary");
             refreshBtn.addActionListener(e -> updateSummary());
+
+            JButton saveBtn = new JButton("Save Daily Log");
+            saveBtn.addActionListener(e -> saveLog());
 
             add(caloriesInLabel);
             add(caloriesOutLabel);
             add(goalStatusLabel);
             add(refreshBtn);
+            add(saveBtn);
         }
 
         private void updateSummary() {
@@ -346,9 +342,20 @@ public class FitnessGUI extends JFrame {
                 goalStatusLabel.setText("Goal Met: " + (summary.isGoalMet() ? "✅ Yes" : "❌ No"));
             }
         }
+
+        private void saveLog() {
+            try {
+                Main.saveDailyLog(today, nutritionLog, workoutLog);
+                JOptionPane.showMessageDialog(this, "Log saved!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                historyPanel.populateDateList();
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Error saving: " + e.getMessage(), 
+                    "Save Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 
-        private class HistoryPanel extends JPanel {
+    private class HistoryPanel extends JPanel {
         private JComboBox<String> dateCombo;
         private JSpinner yearSpinner, monthSpinner, daySpinner;
         private JTextArea logArea;
@@ -358,100 +365,82 @@ public class FitnessGUI extends JFrame {
             setLayout(new BorderLayout(10, 10));
             setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-            // ================== DATE SELECTION PANEL ================== //
-            JPanel datePanel = new JPanel(new GridLayout(2, 1, 10, 10));
+            initializeComponents();
+            setupLayout();
+            configureSpinners();
+        }
 
-            // 1. Existing Logs Dropdown
+        private void initializeComponents() {
             dateCombo = new JComboBox<>();
-            dateCombo.setRenderer(new DefaultListCellRenderer() {
-                @Override
-                public Component getListCellRendererComponent(JList<?> list, Object value, int index,
-                                                              boolean isSelected, boolean cellHasFocus) {
-                    String formatted = LocalDate.parse(value.toString(), dateFormatter)
-                                              .format(DateTimeFormatter.ofPattern("MMM dd, yyyy"));
-                    return super.getListCellRendererComponent(list, formatted, index, isSelected, cellHasFocus);
-                }
-            });
-            populateDateList();
-
-            // 2. Calendar-style Spinner Panel
-            JPanel spinnerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
             yearSpinner = new JSpinner(new SpinnerNumberModel(
                 LocalDate.now().getYear(), 2000, LocalDate.now().getYear() + 1, 1));
             monthSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 12, 1));
             daySpinner = new JSpinner(new SpinnerNumberModel(1, 1, 31, 1));
+            logArea = new JTextArea(15, 60);
+        }
 
-            // Configure spinners
-            configureSpinners();
-            JButton loadBtn = new JButton("Load Selected Date");
-            loadBtn.addActionListener(e -> loadSelectedDate());
+        private void setupLayout() {
+            JPanel datePanel = new JPanel(new GridLayout(2, 1, 10, 10));
+            
+            // Date Combo Panel
+            JPanel comboPanel = new JPanel(new BorderLayout(10, 10));
+            comboPanel.add(new JLabel("Available Logs:"), BorderLayout.NORTH);
+            comboPanel.add(new JScrollPane(dateCombo), BorderLayout.CENTER);
+            
+            JButton refreshBtn = new JButton("Refresh Log List");
+            refreshBtn.addActionListener(e -> populateDateList());
+            comboPanel.add(refreshBtn, BorderLayout.SOUTH);
 
+            // Spinner Panel
+            JPanel spinnerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
             spinnerPanel.add(new JLabel("Year:"));
             spinnerPanel.add(yearSpinner);
             spinnerPanel.add(new JLabel("Month:"));
             spinnerPanel.add(monthSpinner);
             spinnerPanel.add(new JLabel("Day:"));
             spinnerPanel.add(daySpinner);
+            
+            JButton loadBtn = new JButton("Load Selected Date");
+            loadBtn.addActionListener(e -> loadSelectedDate());
             spinnerPanel.add(loadBtn);
-
-            // 3. Refresh Button
-            JButton refreshBtn = new JButton("Refresh Log List");
-            refreshBtn.addActionListener(e -> populateDateList());
-
-            // Assemble date panel
-            JPanel comboPanel = new JPanel(new BorderLayout(10, 10));
-            comboPanel.add(new JLabel("Available Logs:"), BorderLayout.NORTH);
-            comboPanel.add(new JScrollPane(dateCombo), BorderLayout.CENTER);
-            comboPanel.add(refreshBtn, BorderLayout.SOUTH);
 
             datePanel.add(comboPanel);
             datePanel.add(spinnerPanel);
 
-            // ================== LOG DISPLAY AREA ================== //
-            logArea = new JTextArea(15, 60);
+            // Log Area
             logArea.setEditable(false);
             JScrollPane scrollPane = new JScrollPane(logArea);
 
-            // ================== EVENT HANDLING ================== //
+            add(datePanel, BorderLayout.NORTH);
+            add(scrollPane, BorderLayout.CENTER);
+
             dateCombo.addActionListener(e -> {
                 String selected = (String) dateCombo.getSelectedItem();
                 if (selected != null) updateSpinners(selected);
             });
 
-            add(datePanel, BorderLayout.NORTH);
-            add(scrollPane, BorderLayout.CENTER);
+            populateDateList();
         }
 
         private void configureSpinners() {
-            // Automatically adjust day spinner maximum value
-            monthSpinner.addChangeListener(new ChangeListener() {
+            ChangeListener spinnerListener = new ChangeListener() {
                 @Override
                 public void stateChanged(ChangeEvent e) {
-                    int month = (int) monthSpinner.getValue();
-                    int year = (int) yearSpinner.getValue();
-                    updateDaySpinner(month, year);
+                    updateDaySpinner((int) monthSpinner.getValue(), (int) yearSpinner.getValue());
                 }
-            });
-
-            yearSpinner.addChangeListener(new ChangeListener() {
-                @Override
-                public void stateChanged(ChangeEvent e) {
-                    int month = (int) monthSpinner.getValue();
-                    int year = (int) yearSpinner.getValue();
-                    updateDaySpinner(month, year);
-                }
-            });
+            };
+            monthSpinner.addChangeListener(spinnerListener);
+            yearSpinner.addChangeListener(spinnerListener);
         }
 
         private void updateDaySpinner(int month, int year) {
             LocalDate date = LocalDate.of(year, month, 1);
             int maxDays = date.lengthOfMonth();
-            SpinnerNumberModel model = new SpinnerNumberModel(
-                Math.min((int) daySpinner.getValue(), maxDays), 1, maxDays, 1);
-            daySpinner.setModel(model);
+            daySpinner.setModel(new SpinnerNumberModel(
+                Math.min((int) daySpinner.getValue(), maxDays), 1, maxDays, 1));
         }
 
-        private void populateDateList() {
+        public void populateDateList() {
             DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
             File logDir = new File(".");
             File[] logFiles = logDir.listFiles((dir, name) -> name.startsWith("log_") && name.endsWith(".txt"));
@@ -487,26 +476,24 @@ public class FitnessGUI extends JFrame {
         }
 
         private void loadLog(String dateStr) {
-            File file = new File("log_" + dateStr + ".txt");
-            StringBuilder content = new StringBuilder();
-
-            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            try (BufferedReader reader = new BufferedReader(new FileReader("log_" + dateStr + ".txt"))) {
+                StringBuilder content = new StringBuilder();
                 String line;
                 while ((line = reader.readLine()) != null) {
                     content.append(line).append("\n");
                 }
                 logArea.setText(content.toString());
-                logArea.setCaretPosition(0);
             } catch (Exception e) {
                 logArea.setText("Error loading log for " + dateStr + ":\n" + e.getMessage());
             }
         }
     }
 
-    // ================== MAIN METHOD ================== //
+    // ================================= MAIN METHOD ================================= //
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            new FitnessGUI().setVisible(true);
+            FitnessGUI gui = new FitnessGUI();
+            gui.setVisible(true);
         });
     }
 }

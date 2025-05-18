@@ -1,7 +1,7 @@
 public class StrengthTraining extends Exercise {
-    private int sets, reps;
-    private double weight;
-    private double lastUsedWeight;
+    int sets, reps;
+    double weight;
+    double lastUsedWeight;
 
     public StrengthTraining(String name, int duration, int sets, int reps, double weight) {
         super(name, duration);
