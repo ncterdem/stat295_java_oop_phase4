@@ -1,6 +1,4 @@
-import java.io.Serializable;
-
-public class StrengthTraining extends Exercise implements Serializable{
+public class StrengthTraining extends Exercise {
     private int sets, reps;
     private double weight;
     private double lastUsedWeight;

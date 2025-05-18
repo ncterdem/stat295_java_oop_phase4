@@ -1,0 +1,6 @@
+=== NUTRITION ===
+- Banana | Calories: 210
+
+=== WORKOUT ===
+- Cardio: swimming (30 min)
+- StrengthTraining: squat (20 min)

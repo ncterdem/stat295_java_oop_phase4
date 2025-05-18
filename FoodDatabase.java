@@ -1,6 +1,4 @@
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class FoodDatabase {
@@ -19,10 +17,5 @@ public class FoodDatabase {
 
     public static void printAvailableFoods() {
         System.out.println("Available foods: " + foodMap.keySet());
-    }
-
-    // FoodDatabase.java - Add this method
-    public static List<String> getFoodNames() {
-        return new ArrayList<>(foodMap.keySet());
     }
 }

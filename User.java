@@ -1,16 +1,10 @@
-import java.io.Serializable;
-
-public class User implements Serializable {
+public class User {
     private String name;
     private int age;
     private double height; // in meters
     private double weight; // in kg
     private GoalType goalType;
     private int dailyCalorieTarget;
-
-    public String getName() { return name; }
-    public int getAge() { return age; }
-    public double getHeight() { return height; }
 
     public User(String name, int age, double height, double weight, GoalType goalType) {
         this.name = name;
@@ -47,4 +41,17 @@ public class User implements Serializable {
             case MAINTAIN -> "Maintain Weight";
         };
     }
+    public String getName() {
+        return name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
+
 }

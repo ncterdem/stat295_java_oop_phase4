@@ -17,9 +17,6 @@ public class ExerciseDatabase {
         intensityMap.put("swimming", "high");
     }
 
-    public static double getMET(String type) {
-        return metValues.getOrDefault(type.toLowerCase(), 5.0);
-    }
 
     public static String getIntensity(String type) {
         return intensityMap.getOrDefault(type.toLowerCase(), "moderate");

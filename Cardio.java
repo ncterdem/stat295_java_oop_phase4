@@ -1,6 +1,4 @@
-import java.io.Serializable;
-
-public class Cardio extends Exercise implements Serializable{
+public class Cardio extends Exercise {
     private String type;
     private String intensity;
     private double userWeight;

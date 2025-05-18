@@ -1,8 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
-import java.io.Serializable;
 
-public class WorkoutLog implements Serializable {
+public class WorkoutLog {
     private String date;
     private List<Exercise> exercises = new ArrayList<>();
 
