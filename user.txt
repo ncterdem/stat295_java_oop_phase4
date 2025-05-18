@@ -1,5 +1,5 @@
-Eren
-21
-1.78
-87.0
-MAINTAIN
+User
+25
+1.75
+80
+GAIN_MUSCLE

@@ -43,7 +43,7 @@ public class FitnessGUI extends JFrame {
         }
         };
         tabbedPane.setTabPlacement(JTabbedPane.LEFT);
-        tabbedPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Top, Left, Bottom, Right
+        tabbedPane.setBorder(BorderFactory.createEmptyBorder(50, 50, 50, 50)); // Top, Left, Bottom, Right
         tabbedPane.addTab("User", new UserPanel());
         tabbedPane.addTab("Nutrition", new NutritionPanel());
         tabbedPane.addTab("Workout", new WorkoutPanel());
@@ -64,7 +64,7 @@ public class FitnessGUI extends JFrame {
 
         public UserPanel() {
             setLayout(new GridLayout(6, 2, 10, 10));
-            setBorder(BorderFactory.createEmptyBorder(100, 100, 100, 100));
+            setBorder(BorderFactory.createEmptyBorder(50, 50, 50, 50));
 
             nameField = new JTextField();
             ageSpinner = new JSpinner(new SpinnerNumberModel(25, 1, 120, 1));
@@ -506,9 +506,6 @@ public class FitnessGUI extends JFrame {
     // ================================= MAIN METHOD ================================= //
     public static void main(String[] args) {
         FlatLightLaf.setup();
-        SwingUtilities.invokeLater(() -> new FitnessGUI().setVisible(true));
-
-
         SwingUtilities.invokeLater(() -> {
             FitnessGUI gui = new FitnessGUI();
             gui.setVisible(true);
