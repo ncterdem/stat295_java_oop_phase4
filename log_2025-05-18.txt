@@ -1,11 +1,20 @@
 === NUTRITION ===
-- Soy Milk | Calories: 100
+- Strained Yogurt | Calories: 120
+- Strained Yogurt | Calories: 120
+- Strained Yogurt | Calories: 120
+- Strained Yogurt | Calories: 120
+- Strained Yogurt | Calories: 120
+- Sweet Potato | Calories: 112
 - Potato | Calories: 163
-- Beef | Calories: 250
-- Green Beans | Calories: 31
-- Green Beans | Calories: 31
+- Broccoli | Calories: 55
+- Pasta | Calories: 221
+- Chicken Breast | Calories: 200
 
 === WORKOUT ===
-- StrengthTraining: Bench Press (34 min)
-- StrengthTraining: Bench Press (34 min)
-- StrengthTraining: Bench Press (34 min)
+- Cardio: Walking (30 min)
+- Cardio: Running (30 min)
+- Cardio: Cycling (30 min)
+- StrengthTraining: Bench Press (30 min)
+- StrengthTraining: Deadlift (30 min)
+- StrengthTraining: Pull Up (30 min)
+- StrengthTraining: Squat (30 min)
