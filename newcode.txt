@@ -1,166 +1,173 @@
-// FitnessGUI.java (updated)
+// FitnessGUI.java (updated HistoryPanel)
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.List;
 
 public class FitnessGUI extends JFrame {
-    // ... [previous code remains unchanged until WorkoutPanel] ...
+    // ... [previous code remains unchanged] ...
 
-    private class WorkoutPanel extends JPanel {
-        private JTabbedPane exerciseTabs;
+    private class HistoryPanel extends JPanel {
+        private JComboBox<String> dateCombo;
+        private JSpinner yearSpinner, monthSpinner, daySpinner;
+        private JTextArea logArea;
+        private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        public WorkoutPanel() {
-            setLayout(new BorderLayout());
-            exerciseTabs = new JTabbedPane();
-            exerciseTabs.addTab("Cardio", new CardioPanel());
-            exerciseTabs.addTab("Strength", new StrengthPanel());
-            add(exerciseTabs, BorderLayout.CENTER);
-        }
-    }
-
-    private class CardioPanel extends JPanel {
-        private JComboBox<String> exerciseCombo;
-        private JSpinner durationSpinner;
-        private JLabel intensityLabel;
-        private DefaultListModel<String> logModel;
-
-        public CardioPanel() {
+        public HistoryPanel() {
             setLayout(new BorderLayout(10, 10));
             setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-            // Exercise selection
-            exerciseCombo = new JComboBox<>(ExerciseDatabase.metValues.keySet().toArray(new String[0]));
-            exerciseCombo.addActionListener(e -> updateIntensityDisplay());
-            
-            // Intensity display
-            intensityLabel = new JLabel("Intensity: ");
-            
-            // Duration input
-            durationSpinner = new JSpinner(new SpinnerNumberModel(30, 1, 240, 1));
-            
-            // Log list
-            logModel = new DefaultListModel<>();
-            JList<String> logList = new JList<>(logModel);
+            // ================== DATE SELECTION PANEL ================== //
+            JPanel datePanel = new JPanel(new GridLayout(2, 1, 10, 10));
 
-            // Add button
-            JButton addBtn = new JButton("Add Cardio Session");
-            addBtn.addActionListener(e -> addCardioExercise());
+            // 1. Existing Logs Dropdown
+            dateCombo = new JComboBox<>();
+            dateCombo.setRenderer(new DefaultListCellRenderer() {
+                @Override
+                public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                              boolean isSelected, boolean cellHasFocus) {
+                    String formatted = LocalDate.parse(value.toString(), dateFormatter)
+                                              .format(DateTimeFormatter.ofPattern("MMM dd, yyyy"));
+                    return super.getListCellRendererComponent(list, formatted, index, isSelected, cellHasFocus);
+                }
+            });
+            populateDateList();
 
-            // Input panel
-            JPanel inputPanel = new JPanel(new GridLayout(3, 2, 10, 10));
-            inputPanel.add(new JLabel("Exercise Type:"));
-            inputPanel.add(exerciseCombo);
-            inputPanel.add(new JLabel("Duration (minutes):"));
-            inputPanel.add(durationSpinner);
-            inputPanel.add(new JLabel("Intensity Level:"));
-            inputPanel.add(intensityLabel);
+            // 2. Calendar-style Spinner Panel
+            JPanel spinnerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+            yearSpinner = new JSpinner(new SpinnerNumberModel(
+                LocalDate.now().getYear(), 2000, LocalDate.now().getYear() + 1, 1));
+            monthSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 12, 1));
+            daySpinner = new JSpinner(new SpinnerNumberModel(1, 1, 31, 1));
 
-            // Layout
-            add(inputPanel, BorderLayout.NORTH);
-            add(new JScrollPane(logList), BorderLayout.CENTER);
-            add(addBtn, BorderLayout.SOUTH);
+            // Configure spinners
+            configureSpinners();
+            JButton loadBtn = new JButton("Load Selected Date");
+            loadBtn.addActionListener(e -> loadSelectedDate());
 
-            updateIntensityDisplay();
+            spinnerPanel.add(new JLabel("Year:"));
+            spinnerPanel.add(yearSpinner);
+            spinnerPanel.add(new JLabel("Month:"));
+            spinnerPanel.add(monthSpinner);
+            spinnerPanel.add(new JLabel("Day:"));
+            spinnerPanel.add(daySpinner);
+            spinnerPanel.add(loadBtn);
+
+            // 3. Refresh Button
+            JButton refreshBtn = new JButton("Refresh Log List");
+            refreshBtn.addActionListener(e -> populateDateList());
+
+            // Assemble date panel
+            JPanel comboPanel = new JPanel(new BorderLayout(10, 10));
+            comboPanel.add(new JLabel("Available Logs:"), BorderLayout.NORTH);
+            comboPanel.add(new JScrollPane(dateCombo), BorderLayout.CENTER);
+            comboPanel.add(refreshBtn, BorderLayout.SOUTH);
+
+            datePanel.add(comboPanel);
+            datePanel.add(spinnerPanel);
+
+            // ================== LOG DISPLAY AREA ================== //
+            logArea = new JTextArea(15, 60);
+            logArea.setEditable(false);
+            JScrollPane scrollPane = new JScrollPane(logArea);
+
+            // ================== EVENT HANDLING ================== //
+            dateCombo.addActionListener(e -> {
+                String selected = (String) dateCombo.getSelectedItem();
+                if (selected != null) updateSpinners(selected);
+            });
+
+            add(datePanel, BorderLayout.NORTH);
+            add(scrollPane, BorderLayout.CENTER);
         }
 
-        private void updateIntensityDisplay() {
-            String selected = (String) exerciseCombo.getSelectedItem();
-            String intensity = ExerciseDatabase.getIntensity(selected);
-            intensityLabel.setText("Intensity: " + intensity.toUpperCase());
+        private void configureSpinners() {
+            // Automatically adjust day spinner maximum value
+            monthSpinner.addChangeListener(new ChangeListener() {
+                @Override
+                public void stateChanged(ChangeEvent e) {
+                    int month = (int) monthSpinner.getValue();
+                    int year = (int) yearSpinner.getValue();
+                    updateDaySpinner(month, year);
+                }
+            });
+
+            yearSpinner.addChangeListener(new ChangeListener() {
+                @Override
+                public void stateChanged(ChangeEvent e) {
+                    int month = (int) monthSpinner.getValue();
+                    int year = (int) yearSpinner.getValue();
+                    updateDaySpinner(month, year);
+                }
+            });
         }
 
-        private void addCardioExercise() {
-            if (currentUser == null) {
-                JOptionPane.showMessageDialog(this, "Complete user profile first!", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
+        private void updateDaySpinner(int month, int year) {
+            LocalDate date = LocalDate.of(year, month, 1);
+            int maxDays = date.lengthOfMonth();
+            SpinnerNumberModel model = new SpinnerNumberModel(
+                Math.min((int) daySpinner.getValue(), maxDays), 1, maxDays, 1);
+            daySpinner.setModel(model);
+        }
+
+        private void populateDateList() {
+            DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
+            File logDir = new File(".");
+            File[] logFiles = logDir.listFiles((dir, name) -> name.startsWith("log_") && name.endsWith(".txt"));
+
+            if (logFiles != null) {
+                List<LocalDate> dates = new ArrayList<>();
+                for (File file : logFiles) {
+                    String dateStr = file.getName().substring(4, 14);
+                    dates.add(LocalDate.parse(dateStr, dateFormatter));
+                }
+                Collections.sort(dates, Collections.reverseOrder());
+                dates.forEach(date -> model.addElement(date.format(dateFormatter)));
             }
 
-            String type = (String) exerciseCombo.getSelectedItem();
-            int duration = (int) durationSpinner.getValue();
-            String intensity = ExerciseDatabase.getIntensity(type);
-            double weight = currentUser.getWeight();
+            dateCombo.setModel(model);
+        }
 
-            Cardio cardio = new Cardio(
-                type, 
-                duration, 
-                type,  // Pass type as both name and exercise type
-                intensity, 
-                weight
+        private void updateSpinners(String dateStr) {
+            LocalDate date = LocalDate.parse(dateStr, dateFormatter);
+            yearSpinner.setValue(date.getYear());
+            monthSpinner.setValue(date.getMonthValue());
+            daySpinner.setValue(date.getDayOfMonth());
+            loadLog(dateStr);
+        }
+
+        private void loadSelectedDate() {
+            String dateStr = String.format("%04d-%02d-%02d",
+                (int) yearSpinner.getValue(),
+                (int) monthSpinner.getValue(),
+                (int) daySpinner.getValue()
             );
-            
-            workoutLog.addExercise(cardio);
-            logModel.addElement(String.format("%s - %d min (%d kcal)", 
-                type, duration, cardio.calculateCaloriesBurned()));
+            loadLog(dateStr);
+        }
+
+        private void loadLog(String dateStr) {
+            File file = new File("log_" + dateStr + ".txt");
+            StringBuilder content = new StringBuilder();
+
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    content.append(line).append("\n");
+                }
+                logArea.setText(content.toString());
+                logArea.setCaretPosition(0);
+            } catch (Exception e) {
+                logArea.setText("Error loading log for " + dateStr + ":\n" + e.getMessage());
+            }
         }
     }
 
-    private class StrengthPanel extends JPanel {
-        private JComboBox<String> exerciseCombo;
-        private JSpinner durationSpinner, setsSpinner, repsSpinner, weightSpinner;
-        private DefaultListModel<String> logModel;
-
-        public StrengthPanel() {
-            setLayout(new BorderLayout(10, 10));
-            setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
-            // Exercise selection
-            exerciseCombo = new JComboBox<>(
-                StrengthExerciseTemplates.availableExercises.toArray(new String[0])
-            );
-            
-            // Input fields
-            durationSpinner = new JSpinner(new SpinnerNumberModel(30, 1, 240, 1));
-            setsSpinner = new JSpinner(new SpinnerNumberModel(3, 1, 10, 1));
-            repsSpinner = new JSpinner(new SpinnerNumberModel(10, 1, 50, 1));
-            weightSpinner = new JSpinner(new SpinnerNumberModel(20.0, 0.0, 500.0, 2.5));
-            
-            // Log list
-            logModel = new DefaultListModel<>();
-            JList<String> logList = new JList<>(logModel);
-
-            // Add button
-            JButton addBtn = new JButton("Add Strength Session");
-            addBtn.addActionListener(e -> addStrengthExercise());
-
-            // Input panel
-            JPanel inputPanel = new JPanel(new GridLayout(5, 2, 10, 10));
-            inputPanel.add(new JLabel("Exercise:"));
-            inputPanel.add(exerciseCombo);
-            inputPanel.add(new JLabel("Duration (min):"));
-            inputPanel.add(durationSpinner);
-            inputPanel.add(new JLabel("Sets:"));
-            inputPanel.add(setsSpinner);
-            inputPanel.add(new JLabel("Reps per Set:"));
-            inputPanel.add(repsSpinner);
-            inputPanel.add(new JLabel("Weight (kg):"));
-            inputPanel.add(weightSpinner);
-
-            // Layout
-            add(inputPanel, BorderLayout.NORTH);
-            add(new JScrollPane(logList), BorderLayout.CENTER);
-            add(addBtn, BorderLayout.SOUTH);
-        }
-
-        private void addStrengthExercise() {
-            String exercise = (String) exerciseCombo.getSelectedItem();
-            int duration = (int) durationSpinner.getValue();
-            int sets = (int) setsSpinner.getValue();
-            int reps = (int) repsSpinner.getValue();
-            double weight = (double) weightSpinner.getValue();
-
-            StrengthTraining session = new StrengthTraining(
-                exercise,
-                duration,
-                sets,
-                reps,
-                weight
-            );
-
-            workoutLog.addExercise(session);
-            logModel.addElement(String.format("%s - %d×%d @ %.1fkg (%d kcal)", 
-                exercise, sets, reps, weight, session.calculateCaloriesBurned()));
-        }
-    }
-
-    // ... [remaining code unchanged] ...
+    // ... [rest of the code unchanged] ...
 }
