@@ -2,8 +2,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ExerciseDatabase {
-    private static final Map<String, Double> metValues = new HashMap<>();
-    private static final Map<String, String> intensityMap = new HashMap<>();
+    static final Map<String, Double> metValues = new HashMap<>();
+    static final Map<String, String> intensityMap = new HashMap<>();
 
     static {
         metValues.put("running", 9.8);

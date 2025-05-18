@@ -1,7 +1,7 @@
 import java.util.List;
 
 public class StrengthExerciseTemplates {
-    private static final List<String> availableExercises = List.of(
+    static final List<String> availableExercises = List.of(
             "squat", "bench press", "deadlift", "shoulder press", "pull up"
     );
 
