@@ -1,6 +1,6 @@
 === NUTRITION ===
-- Banana | Calories: 210
+- Eggplant | Calories: 50
 
 === WORKOUT ===
-- Cardio: swimming (30 min)
-- StrengthTraining: squat (20 min)
+- Cardio: running (30 min)
+- StrengthTraining: squat (30 min)
