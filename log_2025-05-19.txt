@@ -1,12 +1,18 @@
 === NUTRITION ===
-- Strawberries | Calories: 49
-- Strawberries | Calories: 49
-- Strawberries | Calories: 49
-- Strawberries | Calories: 49
-- Strawberries | Calories: 49
-- Strawberries | Calories: 49
-- Strawberries | Calories: 49
+- Zucchini | Calories: 17
+- Tomato | Calories: 22
+- Sweet Potato | Calories: 112
+- Tuna | Calories: 132
+- Watermelon | Calories: 46
 
 === WORKOUT ===
-- Cardio: swimming (30 min)
-- StrengthTraining: pull up (30 min)
+- Cardio: Walking (30 min)
+- Cardio: Cycling (26 min)
+- Cardio: Swimming (36 min)
+- StrengthTraining: Bench Press (30 min)
+- StrengthTraining: Deadlift (30 min)
+- StrengthTraining: Deadlift (30 min)
+- StrengthTraining: Deadlift (30 min)
+- StrengthTraining: Deadlift (30 min)
+- StrengthTraining: Pull Up (30 min)
+- StrengthTraining: Pull Up (30 min)

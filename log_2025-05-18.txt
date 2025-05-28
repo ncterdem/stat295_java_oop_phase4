@@ -1,20 +1,8 @@
 === NUTRITION ===
-- Strained Yogurt | Calories: 120
-- Strained Yogurt | Calories: 120
-- Strained Yogurt | Calories: 120
-- Strained Yogurt | Calories: 120
-- Strained Yogurt | Calories: 120
-- Sweet Potato | Calories: 112
-- Potato | Calories: 163
-- Broccoli | Calories: 55
+- Beef | Calories: 500
+- Egg | Calories: 78
 - Pasta | Calories: 221
-- Chicken Breast | Calories: 200
 
 === WORKOUT ===
 - Cardio: Walking (30 min)
-- Cardio: Running (30 min)
-- Cardio: Cycling (30 min)
-- StrengthTraining: Bench Press (30 min)
 - StrengthTraining: Deadlift (30 min)
-- StrengthTraining: Pull Up (30 min)
-- StrengthTraining: Squat (30 min)
